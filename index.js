@@ -4,10 +4,9 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import serverless from "serverless-http";
-
-import { ConnectToDB } from "../DB/mongoose.js";
-import authRouter from "../routes/auth-routes.js";
-import productRouter from "../routes/product-routes.js";
+import { ConnectToDB } from "./DB/mongoose.js";
+import authRouter from "./routes/auth-routes.js"
+import productRouter from "./routes/product-routes.js";
 
 dotenv.config();
 

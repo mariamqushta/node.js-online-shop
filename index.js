@@ -1,3 +1,4 @@
+// index.js
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
@@ -13,56 +14,53 @@ dotenv.config();
 
 const app = express();
 
+// CORS middleware
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://react-online-shop-xzgh.vercel.app",
-      "https://your-frontend-domain.vercel.app" // Add your actual frontend
+      "https://react-online-shop-xzgh.vercel.app", // your deployed frontend
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
+// JSON parsing and logging
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
 
-app.use("/.netlify/functions/api/auth", authRouter);
-app.use("/.netlify/functions/api/products", productRouter);
+// Routes
+app.use("/auth", authRouter);
+app.use("/products", productRouter);
 
 // Health check endpoint
 app.get("/", (req, res) => {
-  res.json({ 
+  res.json({
     message: "API is running 🚀",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
 app.get("/health", (req, res) => {
-  res.status(200).json({ 
-    status: "OK", 
-    database: isConnected ? "Connected" : "Disconnected" 
+  res.status(200).json({
+    status: "OK",
+    database: isConnected ? "Connected" : "Disconnected",
   });
 });
 
-/* DB connection with better error handling */
+/* Database connection */
 let isConnected = false;
 let dbConnectionPromise = null;
 
 async function connectDB() {
-  if (isConnected) {
-    console.log("Using existing database connection");
-    return;
-  }
+  if (isConnected) return;
 
   try {
-    console.log("Creating new database connection");
+    console.log("Connecting to MongoDB...");
     await ConnectToDB();
     isConnected = true;
-    console.log("Database connected successfully");
+    console.log("MongoDB connected successfully");
   } catch (error) {
     console.error("Database connection failed:", error);
     throw error;
@@ -72,7 +70,5 @@ async function connectDB() {
 // Connect on cold start
 connectDB().catch(console.error);
 
-// Export for Vercel
-const handler = serverless(app);
-
-export { handler };
+// Export handler for Vercel
+export const handler = serverless(app);

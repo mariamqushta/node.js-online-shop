@@ -18,6 +18,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://react-online-shop-xzgh.vercel.app",
+      "https://your-frontend-domain.vercel.app" // Add your actual frontend
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -29,21 +30,49 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
 
-app.use("/auth", authRouter);
-app.use("/products", productRouter);
+app.use("/.netlify/functions/api/auth", authRouter);
+app.use("/.netlify/functions/api/products", productRouter);
 
+// Health check endpoint
 app.get("/", (req, res) => {
-  res.json({ message: "API is running 🚀" });
+  res.json({ 
+    message: "API is running 🚀",
+    timestamp: new Date().toISOString()
+  });
 });
 
-/* DB connect once */
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "OK", 
+    database: isConnected ? "Connected" : "Disconnected" 
+  });
+});
+
+/* DB connection with better error handling */
 let isConnected = false;
-async function connectDBOnce() {
-  if (!isConnected) {
+let dbConnectionPromise = null;
+
+async function connectDB() {
+  if (isConnected) {
+    console.log("Using existing database connection");
+    return;
+  }
+
+  try {
+    console.log("Creating new database connection");
     await ConnectToDB();
     isConnected = true;
+    console.log("Database connected successfully");
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    throw error;
   }
 }
-connectDBOnce();
 
-export default serverless(app);
+// Connect on cold start
+connectDB().catch(console.error);
+
+// Export for Vercel
+const handler = serverless(app);
+
+export { handler };

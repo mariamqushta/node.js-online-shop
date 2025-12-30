@@ -1,19 +1,19 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-let cached = global.mongoose;
+dotenv.config();
 
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
-
-export async function ConnectToDB() {
-  if (cached.conn) return cached.conn;
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(process.env.DB_URL);
-  }
-
-  cached.conn = await cached.promise;
-  console.log("Connected to DB");
-  return cached.conn;
+export function ConnectToDB(){
+    try{
+        mongoose.connect(process.env.DB_URL).then(
+            ()=>{
+                console.log("connected to db successully");
+            }
+        ).catch((e)=>{
+               console.log(`error to connect :${e}`);
+        })
+           
+    }catch(error){
+       console.log(`error:${error}`);
+    }
 }

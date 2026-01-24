@@ -9,7 +9,7 @@ export const register = expressAsyncHandler(async (req, res) => {
   const { name, email, password, ProfileImage, role } = req.body;
 
   // 1. Check if user already exists
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({ email : email });
   if (userExists) {
     res.status(400);
     throw new Error("User already exists");
@@ -113,4 +113,5 @@ export const getAllProducts = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+
 };

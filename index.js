@@ -13,7 +13,6 @@ const port=process.env.PORT||3000;
 app.use(
   cors({
     origin: [
-      "*",
       "http://localhost:3000",
       "https://react-online-shop-rouge.vercel.app",
      
@@ -45,5 +44,6 @@ ConnectToDB()
 app.listen(port,()=>{
     console.log(`app work on port ${port}`)
 });
+
 
 

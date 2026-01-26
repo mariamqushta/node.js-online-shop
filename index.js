@@ -15,7 +15,7 @@ app.use(
     origin: [
       "*",
       "http://localhost:3000",
-      "https://react-online-shop-rouge.vercel.app/"
+      "https://react-online-shop-rouge.vercel.app",
      
     ], // Allow only your frontend
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Allowed methods
@@ -45,4 +45,5 @@ ConnectToDB()
 app.listen(port,()=>{
     console.log(`app work on port ${port}`)
 });
+
 
